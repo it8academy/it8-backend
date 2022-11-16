@@ -12,30 +12,35 @@ exports.userSignUp = async (req, res) => {
       state,
       country,
       mode_of_learning,
+      phone_number,
+      course,
     } = req.body;
 
     // validate user input
     if (
-      !(
-        email &&
+      !(email &&
         first_name &&
         last_name &&
         state &&
         country &&
-        mode_of_learning
-      )
+        mode_of_learning &&
+        course,
+      phone_number)
     ) {
-      res.status(400).send("All input is required");
+      return res.status(400).json({
+        message: "All input is required",
+      });
     }
 
     // check if user already exist
     const userExist = await User.findOne({
       email,
-      phone_number,
     });
 
     if (userExist) {
-      return res.status(409).send("User Already Exist. Please Login");
+      return res
+        .status(409)
+        .json({ message: "User Already Exist. Please Login" });
     }
 
     // create user in our database
@@ -48,6 +53,8 @@ exports.userSignUp = async (req, res) => {
       country,
       payment_status: "unpaid",
       mode_of_learning,
+      course,
+      phone_number,
     });
 
     // create token
@@ -62,9 +69,9 @@ exports.userSignUp = async (req, res) => {
     return res.status(201).json({
       message: "User created successfully",
       token,
-      user,
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({
       status: "fail",
       message: error,
@@ -117,7 +124,7 @@ exports.userLogin = async (req, res) => {
 
     // validate user input
     if (!(email && password)) {
-      res.status(400).send("All input is required");
+      return res.status(400).json({ message: "All input is required" });
     }
 
     // validate if user exist in our database
@@ -126,8 +133,10 @@ exports.userLogin = async (req, res) => {
     });
 
     // check if user has paid for the course
-    if (user.payment_status === "unpaid") {
-      return res.status(400).send("Please pay for the course");
+    if (user?.payment_status === "unpaid") {
+      return res.status(400).json({
+        message: "Please pay for the course, before you can login",
+      });
     }
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -149,7 +158,8 @@ exports.userLogin = async (req, res) => {
     }
     return res.status(400).send("Invalid Credentials");
   } catch (error) {
-    return res.status(400).json({
+    console.log(error);
+    return res.status(500).json({
       status: "fail",
       message: error,
     });
