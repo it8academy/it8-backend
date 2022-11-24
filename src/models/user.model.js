@@ -4,34 +4,27 @@ const userSchema = new mongoose.Schema(
   {
     first_name: {
       type: String,
-      required: true,
+      required: [true, "Please provide your first name"],
     },
     last_name: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Please provide your last name"],
+      unique: [true, "Please provide your last name"],
     },
     phone_number: {
-      type:String,
+      type: String,
+      required: [true, "Please provide your phone number"],
     },
     password: {
       type: String,
+      required: [true, "Please provide a password"],
     },
-    avatar: {
-      type: String,
-    },
+  
     email: {
       type: String,
-      required: true,
+      required: [true, "Please provide your email"],
     },
-    state: {
-      type: String,
-      required: true,
-    },
-    country: {
-      type: String,
-      required: true,
-    },
+
     course: {
       type: String,
       required: true,

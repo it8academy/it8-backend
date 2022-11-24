@@ -1,31 +1,40 @@
 const User = require("../models/user.model");
+const Transaction = require("../models/transaction.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const axios = require("axios");
 
 exports.userSignUp = async (req, res) => {
+  const session = await mongoose.startSession(); // Start Session
+  session.startTransaction(); // start Transaction
   try {
     const {
       first_name,
       last_name,
-      avatar,
       email,
-      state,
-      country,
       mode_of_learning,
       phone_number,
       course,
+
+      course_amount,
+      transaction_id,
+      tx_ref,
+      flw_ref,
+      status,
     } = req.body;
 
     // validate user input
     if (
-      !(email &&
+      !(
+        email &&
         first_name &&
         last_name &&
-        state &&
-        country &&
         mode_of_learning &&
-        course,
-      phone_number)
+        course &&
+        phone_number &&
+        course_amount
+      )
     ) {
       return res.status(400).json({
         message: "All input is required",
@@ -43,18 +52,37 @@ exports.userSignUp = async (req, res) => {
         .json({ message: "User Already Exist. Please Login" });
     }
 
+    // flutter wave payment
+    let txref = tx_ref;
+    let secret_key = process.env.FLUTTER_WAVE_SECRET_KEY;
+    const response = await axios({
+      method: "post",
+      data: {
+        txref,
+        SECKEY: secret_key,
+      },
+      url: `https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/verify`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (
+      response.data.data.status !== "successful" &&
+      response.data.data.chargecode != "00"
+    ) {
+      return errorResMsg(res, 500, "User Payment was not successful");
+    }
+
     // create user in our database
     const user = await User.create({
       first_name,
       last_name,
-      avatar,
       email,
-      state,
-      country,
-      payment_status: "unpaid",
+      payment_status: "paid",
       mode_of_learning,
       course,
       phone_number,
+      course_amount,
     });
 
     // create token
@@ -66,12 +94,32 @@ exports.userSignUp = async (req, res) => {
       }
     );
 
+    // save  flutterwave transaction details in Transaction model
+    const transaction = await Transaction.create({
+      flwtransId: transaction_id,
+      flwRef: flw_ref,
+      transRef: tx_ref,
+      paymentStatus: status,
+      user: user._id,
+      amount: course_amount,
+      email: email,
+    });
+
+    // commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
     return res.status(201).json({
+      status: "success",
       message: "User created successfully",
+      user,
       token,
+      transaction,
     });
   } catch (error) {
     console.log(error);
+    await session.abortTransaction(); // Abort Transaction
+    session.endSession(); // End Session
     return res.status(400).json({
       status: "fail",
       message: error,
