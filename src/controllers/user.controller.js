@@ -24,6 +24,8 @@ exports.userSignUp = async (req, res) => {
       status,
     } = req.body;
 
+    console.log(req.body);
+
     // validate user input
     if (
       !(
@@ -33,7 +35,7 @@ exports.userSignUp = async (req, res) => {
         mode_of_learning &&
         course &&
         phone_number &&
-        course_amount && 
+        course_amount &&
         password
       )
     ) {
@@ -54,27 +56,27 @@ exports.userSignUp = async (req, res) => {
     }
 
     // flutter wave payment
-    let txref = tx_ref;
-    let secret_key = process.env.FLUTTER_WAVE_SECRET_KEY;
-    const response = await axios({
-      method: "post",
-      data: {
-        txref,
-        SECKEY: secret_key,
-      },
-      url: `https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/verify`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // let txref = tx_ref;
+    // let secret_key = process.env.FLUTTER_WAVE_SECRET_KEY;
+    // const response = await axios({
+    //   method: "post",
+    //   data: {
+    //     txref,
+    //     SECKEY: secret_key,
+    //   },
+    //   url: `https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/verify`,
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
 
-    console.log(response.data);
-    if (
-      response.data.data.status !== "successful" &&
-      response.data.data.chargecode != "00"
-    ) {
-      return errorResMsg(res, 500, "User Payment was not successful");
-    }
+    // console.log(response.data);
+    // if (
+    //   response.data.data.status !== "successful" &&
+    //   response.data.data.chargecode != "00"
+    // ) {
+    //   return errorResMsg(res, 500, "User Payment was not successful");
+    // }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -101,15 +103,15 @@ exports.userSignUp = async (req, res) => {
     );
 
     // save  flutterwave transaction details in Transaction model
-    const transaction = await Transaction.create({
-      flwtransId: transaction_id,
-      flwRef: flw_ref,
-      transRef: tx_ref,
-      paymentStatus: status,
-      user: user._id,
-      amount: course_amount,
-      email: email,
-    });
+    // const transaction = await Transaction.create({
+    //   flwtransId: transaction_id,
+    //   flwRef: flw_ref,
+    //   transRef: tx_ref,
+    //   paymentStatus: status,
+    //   user: user._id,
+    //   amount: course_amount,
+    //   email: email,
+    // });
 
     // commit transaction
     await session.commitTransaction();
