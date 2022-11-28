@@ -16,9 +16,9 @@ exports.userSignUp = async (req, res) => {
       mode_of_learning,
       phone_number,
       course,
-
       course_amount,
       transaction_id,
+      password,
       tx_ref,
       flw_ref,
       status,
@@ -33,7 +33,8 @@ exports.userSignUp = async (req, res) => {
         mode_of_learning &&
         course &&
         phone_number &&
-        course_amount
+        course_amount && 
+        password
       )
     ) {
       return res.status(400).json({
@@ -66,6 +67,8 @@ exports.userSignUp = async (req, res) => {
         "Content-Type": "application/json",
       },
     });
+
+    console.log(response.data);
     if (
       response.data.data.status !== "successful" &&
       response.data.data.chargecode != "00"
@@ -73,6 +76,8 @@ exports.userSignUp = async (req, res) => {
       return errorResMsg(res, 500, "User Payment was not successful");
     }
 
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     // create user in our database
     const user = await User.create({
       first_name,
@@ -83,6 +88,7 @@ exports.userSignUp = async (req, res) => {
       course,
       phone_number,
       course_amount,
+      password: hashedPassword,
     });
 
     // create token
