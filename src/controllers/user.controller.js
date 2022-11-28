@@ -122,7 +122,7 @@ exports.userSignUp = async (req, res) => {
       message: "User created successfully",
       user,
       token,
-      transaction,
+      // transaction,
     });
   } catch (error) {
     console.log(error);
