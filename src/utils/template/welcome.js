@@ -121,7 +121,7 @@ exports.registrationTemplate = async (
                     <br />
                     <strong>Account Name: </strong> Kehinde Omolabi
                     <br />
-                    <strong>Bank: </strong> Guarantee Trust Bank
+                    <strong>Bank: </strong> Guaranty Trust Bank
                     <br />
                     <br />
                     <br />
