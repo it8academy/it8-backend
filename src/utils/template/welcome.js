@@ -112,6 +112,7 @@ exports.registrationTemplate = async (
                     <strong>Course: ${course}</strong>
                     <br />
                     <strong>Mode of learning: ${modeOfLearning} </strong>
+                    <br />
 
                     <strong>Amount: </strong>NGN ${courseAmount}
                     <br />
