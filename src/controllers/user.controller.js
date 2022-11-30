@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const axios = require("axios");
+const sendEmail = require("../utils/email ");
+const { registrationTemplate } = require("../utils/template/welcome");
 
 exports.userSignUp = async (req, res) => {
   const session = await mongoose.startSession(); // Start Session
@@ -17,16 +19,11 @@ exports.userSignUp = async (req, res) => {
       phone_number,
       course,
       course_amount,
-      transaction_id,
       password,
-      tx_ref,
-      flw_ref,
       status,
     } = req.body;
 
-    console.log(req.body);
 
-    // validate user input
     if (
       !(
         email &&
@@ -55,37 +52,14 @@ exports.userSignUp = async (req, res) => {
         .json({ message: "User Already Exist. Please Login" });
     }
 
-    // flutter wave payment
-    // let txref = tx_ref;
-    // let secret_key = process.env.FLUTTER_WAVE_SECRET_KEY;
-    // const response = await axios({
-    //   method: "post",
-    //   data: {
-    //     txref,
-    //     SECKEY: secret_key,
-    //   },
-    //   url: `https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/verify`,
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // });
-
-    // console.log(response.data);
-    // if (
-    //   response.data.data.status !== "successful" &&
-    //   response.data.data.chargecode != "00"
-    // ) {
-    //   return errorResMsg(res, 500, "User Payment was not successful");
-    // }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     // create user in our database
-    const user = await User.create({
+    const user = new User({
       first_name,
       last_name,
       email,
-      payment_status: "paid",
+      payment_status: "unpaid",
       mode_of_learning,
       course,
       phone_number,
@@ -102,16 +76,24 @@ exports.userSignUp = async (req, res) => {
       }
     );
 
-    // save  flutterwave transaction details in Transaction model
-    // const transaction = await Transaction.create({
-    //   flwtransId: transaction_id,
-    //   flwRef: flw_ref,
-    //   transRef: tx_ref,
-    //   paymentStatus: status,
-    //   user: user._id,
-    //   amount: course_amount,
-    //   email: email,
-    // });
+
+    // send email to user
+    await sendEmail({
+      email,
+      subject: "Welcome to the course",
+      text: "Welcome to the course",
+      html: await registrationTemplate(
+        user.first_name,
+        user.last_name,
+        course,
+        mode_of_learning,
+        course_amount,
+        user._id
+      ),
+    });
+
+    // save user
+    await user.save({ session });
 
     // commit transaction
     await session.commitTransaction();

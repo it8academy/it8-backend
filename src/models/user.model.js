@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema(
     last_name: {
       type: String,
       required: [true, "Please provide your last name"],
-      unique: [true, "Please provide your last name"],
     },
     phone_number: {
       type: String,
