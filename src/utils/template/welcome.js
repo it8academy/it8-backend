@@ -109,6 +109,7 @@ exports.registrationTemplate = async (
                     <br />
 
                   Payment Details are as follows:
+                  <br />
                     <strong>Course: ${course}</strong>
                     <br />
                     <strong>Mode of learning: ${modeOfLearning} </strong>
