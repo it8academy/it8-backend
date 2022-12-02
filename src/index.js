@@ -11,7 +11,7 @@ const port = process.env.PORT || 3456;
 connectDB();
 
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
