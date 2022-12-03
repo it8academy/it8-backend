@@ -128,7 +128,9 @@ exports.registrationTemplate = async (
                     <br />
                     <br />
                     <br />
-                    <strong>NOTE: </strong> Please send a screenshot of your payment to <a href="https://wa.me/2348133832003">+2348133832003</a> 
+                    <strong>NOTE: <br>
+                    </strong> Please send a screenshot of your payment to <a href="https://wa.me/2348133832003">+2348133832003</a> 
+                    Add your reference number: it8-${userId} to the transaction details.
                     <br />
                     <strong> Contact Us: +2348133832003 </strong>
 
