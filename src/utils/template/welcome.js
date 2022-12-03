@@ -99,7 +99,7 @@ exports.registrationTemplate = async (
                   <br />
                   <br />
       
-                  <strong>IT8</strong> is a Software and Web Development Academy that is committed to providing the best training in the industry.
+                  <strong>it8</strong> is a Software and Web Development Academy that is committed to providing the best training in the industry.
                    We are a team of highly skilled and experienced professionals who are passionate about teaching and helping people to achieve their goals.
                   <br />
                   <br />
@@ -109,7 +109,8 @@ exports.registrationTemplate = async (
                     <br />
 
                   Payment Details are as follows:
-                  <br />
+                   <br />
+                   <br />
                     <strong>Course: ${course}</strong>
                     <br />
                     <strong>Mode of learning: ${modeOfLearning} </strong>
@@ -117,7 +118,7 @@ exports.registrationTemplate = async (
 
                     <strong>Amount: </strong>NGN ${courseAmount}
                     <br />
-                    <strong>Reference: </strong>IT8-${userId}
+                    <strong>Reference: </strong>it8-${userId}
                     <br />
                     <strong>Account Number: </strong> 0157518989
                     <br />
@@ -134,7 +135,7 @@ exports.registrationTemplate = async (
                 </p>
                 <br/>
                 <a
-                  href="https://it8.com.ng"
+                  href="https://it8-fe.vercel.app/"
                   target="_blank"
                   style="
                     text-decoration: none;
