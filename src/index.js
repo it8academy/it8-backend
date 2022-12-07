@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json("welcome to it8");
 });
 
