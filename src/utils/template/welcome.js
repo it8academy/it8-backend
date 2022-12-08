@@ -129,6 +129,7 @@ exports.registrationTemplate = async (
                     <br />
                     <br />
                     <strong>NOTE: <br>
+                    <strong> Click on the link below to make payment </strong> <a href="https://paystack.com/pay/it8-payment">https://paystack.com/pay/it8-payment</a> </strong> <br>
                     </strong> Please send a screenshot of your payment to <a href="https://wa.me/2348133832003">+2348133832003</a> 
                     <br />
                     Add your reference number: it8-${userId} to the transaction details.

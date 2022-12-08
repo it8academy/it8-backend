@@ -1,6 +1,5 @@
 require("dotenv").config()
-const express = require('express');
-const morgan  = require("morgan")
+const express = require("express");
 const connectDB = require("./database/db");
 const authRoutes = require("./routes/user.routes");
 const cors = require("cors")
@@ -13,9 +12,7 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+
 
 app.get("/health", (req, res) => {
   res.status(200).json("welcome to it8");
