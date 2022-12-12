@@ -181,17 +181,24 @@ exports.userForgotPassword = async (req, res) => {
       return res.status(400).json({ message: "Token not generated" });
     }
 
-    // save token to database
-    await db.query(
-      "UPDATE users SET reset_password_token = ? WHERE email = ?",
-      [token, email]
+    // save token to database and update reset_password_expires to 5 minutes from now
+
+    let date = new Date();
+    date.setMinutes(date.getMinutes() + 5);
+    reset_password_expires = date;
+    const updateToken = await db.query(
+      "UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE email = ?",
+      [token, reset_password_expires, email]
     );
 
-    // reset link
+    if (!updateToken[0].affectedRows) {
+      return res.status(400).json({ message: "Token not saved" });
+    }
 
+    // create reset password url
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
-    // send email to user
+    // send reset password email to user
     await sendEmail({
       email,
       subject: "Reset your password",
@@ -201,7 +208,7 @@ exports.userForgotPassword = async (req, res) => {
 
     return res.status(200).json({
       status: "success",
-      message: "Password reset link sent to your email",
+      message: "Password reset token sent to email",
     });
   } catch (error) {
     console.log(error);

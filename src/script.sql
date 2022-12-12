@@ -14,11 +14,27 @@ CREATE TABLE
         payment_status VARCHAR(50),
         password VARCHAR(100) NOT NULL,
         reset_password_token VARCHAR(300),
-        reset_password_expires TIMESTAMP,
+        reset_password_expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         email VARCHAR(50) NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+--  Add more tables to an existing table users
+
+ALTER TABLE users
+ADD UNIQUE(email),
+ADD COLUMN age VARCHAR(50),
+ADD COLUMN gender VARCHAR(50),
+ADD
+    COLUMN address VARCHAR(50),
+ADD COLUMN city VARCHAR(50),
+ADD
+    COLUMN country VARCHAR(50),
+ADD
+    COLUMN zip_code VARCHAR(50),
+ADD
+    COLUMN occupation VARCHAR(50);
 
 CREATE TABLE
     IF NOT EXISTS transactions(

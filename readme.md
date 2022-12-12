@@ -1,6 +1,9 @@
 ### Login to mysql
 ❯ mysql -u root -p
 
+#### Drop database
+❯ drop database database_name;
+
 #### use database
 ❯ use database_name;
 > use it8academy;
