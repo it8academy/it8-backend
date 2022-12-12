@@ -1,6 +1,6 @@
 exports.registrationTemplate = async (
-  firstName,
-  lastName,
+  first_name,
+  last_name,
   course,
   modeOfLearning,
   courseAmount,
@@ -94,7 +94,7 @@ exports.registrationTemplate = async (
                 </div>
                 <p style="font-size: 18px; line-height: 30px; font-weight: 400">
                 
-                  Welcome <span class="welcome">${firstName} ${lastName}</span> to the world of learning
+                  Welcome <span class="welcome">${first_name} ${last_name}</span> to the world of learning
                   <br />
                   <br />
                   <br />
@@ -139,7 +139,7 @@ exports.registrationTemplate = async (
                 </p>
                 <br/>
                 <a
-                  href="https://it8-fe.vercel.app/"
+                  href="https://it8-academy.com/"
                   target="_blank"
                   style="
                     text-decoration: none;
