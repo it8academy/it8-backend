@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/email ");
 const { registrationTemplate } = require("../utils/template/welcome");
 const db = require("../database/db");
+const { createInvoice } = require("easyinvoice");
+const fs = require("fs");
 
 // user sign up
 exports.userSignUp = async (req, res) => {
@@ -68,6 +70,79 @@ exports.userSignUp = async (req, res) => {
       ]
     );
 
+    let get_user_created_at = await db.query(
+      "SELECT created_at FROM users WHERE id = ?",
+      [user[0].insertId]
+    );
+
+    // format date to dd/mm/yyyy
+    let date = new Date(get_user_created_at[0][0].created_at);
+    let dd = date.getDate();
+    let mm = date.getMonth() + 1;
+    let yyyy = date.getFullYear();
+    if (dd < 10) {
+      dd = "0" + dd;
+    }
+    if (mm < 10) {
+      mm = "0" + mm;
+    }
+    get_user_created_at[0][0].created_at = dd + "/" + mm + "/" + yyyy;
+
+    let invoiceNumber = Math.floor(Math.random() * 1000000000);
+    // create invoice
+    let data = {
+      client: {
+        company: `${first_name} ${last_name}`,
+        address: "Adigbe",
+        zip: "23401",
+        city: "Abeokuta",
+        country: "Nigeria",
+        mode_of_learning,
+        phone_number,
+        course,
+      },
+
+      sender: {
+        company: "it8",
+        address: "Adigbe",
+        zip: "23401",
+        city: "Abeokuta",
+        country: "Nigeria",
+      },
+
+      images: {
+        logo: "https://res.cloudinary.com/drsimple/image/upload/v1669792225/Logo_presentation_2_wvx2v9.png",
+      },
+
+      information: {
+        number: invoiceNumber,
+        date: get_user_created_at[0][0].created_at,
+        dueDate: "No due date",
+      },
+
+      products: [
+        {
+          quantity: "1",
+          description: `Course fee for ${course.toUpperCase()}.`,
+          "tax-rate": 0,
+          price: +course_amount,
+        },
+      ],
+
+      bottomNotice:
+        "Thank you for your business. Please make payment to the account below.",
+      settings: {
+        currency: "NGN",
+      },
+
+      translate: {},
+
+      customize: {},
+    };
+    let created = await createInvoice(data);
+
+    fs.writeFileSync("invoice.pdf", created.pdf, "base64");
+
     // send welcome email to user
     await sendEmail({
       email,
@@ -81,6 +156,13 @@ exports.userSignUp = async (req, res) => {
         course_amount,
         user[0].insertId
       ),
+      attachments: [
+        {
+          filename: "invoice.pdf",
+          content: created.pdf,
+          encoding: "base64",
+        },
+      ],
     });
 
     // create token
@@ -236,7 +318,9 @@ exports.userResetPassword = async (req, res) => {
     );
 
     if (!user[0].length) {
-      return res.status(400).json({ message: "User does not exist" });
+      return res
+        .status(400)
+        .json({ message: "Retry forgot password again, credentials expired" });
     }
 
     // hash user password
